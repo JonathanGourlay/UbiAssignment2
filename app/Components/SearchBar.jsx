@@ -20,9 +20,10 @@ const SearchView = () => {
   let mealType = MealType.useContainer();
   let themeType = useTheme();
   const [searchedText, setSearchedText] = React.useState();
+  const [calRange, setCalRage] = React.useState({ min: 0, max: 9000 })
+  const [maxIng, setMaxIng] = React.useState(40)
   const [state, setState] = React.useState([]);
   const [searchNum, setSearchNum] = React.useState(30);
-  const [refreshing, setRefreshing] = React.useState(false);
   const mealRef = React.useRef(mealType.searchMealType)
 
   useBackHandler(() => {
@@ -40,7 +41,7 @@ const SearchView = () => {
   const RunSearch = (searchParam) => {
     if (searchParam !== "" && searchParam !== undefined) {
       fetch(
-        "https://edamam-recipe-search.p.rapidapi.com/search?q=" + searchParam + "&to=" + searchNum,
+        "https://edamam-recipe-search.p.rapidapi.com/search?q=" + searchParam + "&to=" + searchNum + "&calories=" + calRange.min + "-" + calRange.max + "&ingr=" + maxIng,
         {
           method: "GET",
           headers: {
@@ -61,10 +62,10 @@ const SearchView = () => {
   const onSubmit = (text) => {
     RunSearch(text);
   }
-  const submitMeal = (mealObject, MealType) => {
+  const submitMeal = (mealObject, mealTime) => {
     firebase.firestore().collection("/meals").add({
       ...mealObject,
-      MealType
+      mealTime
     }).then(() => {
 
     })
@@ -86,11 +87,10 @@ const SearchView = () => {
         lightTheme={themeType.dark}
         round
       />
-      <Text style={{ height: 40, alignSelf: 'center' }}>Number of recipies to search</Text>
-      <Text style={{ height: 40, alignSelf: 'center' }}>{searchNum}</Text>
+      <Text style={{ height: 20, alignSelf: 'center' }}>Number of recipies to search{" - " + searchNum}</Text>
       <Slider
         style={{ width: 400, height: 40 }}
-        minimumValue={0}
+        minimumValue={5}
         maximumValue={50}
         minimumTrackTintColor="#FFFFFF"
         maximumTrackTintColor="#000000"
@@ -98,11 +98,33 @@ const SearchView = () => {
         step={5}
         onSlidingComplete={(num) => { setSearchNum(num) }}
       />
-      <Text style={{ height: 40, alignSelf: 'center' }}>{mealType.searchMealType}</Text>
+      <Text style={{ height: 20, alignSelf: 'center' }}>Range of calories to filter by</Text>
+      <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
+
+        <TextInput
+          keyboardType='number-pad'
+          style={{ height: 40, width: 50, padding: 10, borderColor: 'gray', borderWidth: 1, alignSelf: 'center' }}
+          onChangeText={text => setCalRage({ min: text, max: calRange.max })}
+          placeholder={"Min"}
+        />
+        <TextInput
+          keyboardType='number-pad'
+          style={{ height: 40, width: 50, padding: 10, borderColor: 'gray', borderWidth: 1, alignSelf: 'center' }}
+          onChangeText={text => setCalRage({ min: calRange.min, max: text })}
+          placeholder={"Max"}
+        />
+      </View>
+      <Text style={{ height: 20, alignSelf: 'center' }}>Max number of ingredients</Text>
+      <TextInput
+        keyboardType='number-pad'
+        style={{ height: 40, width: 50, padding: 10, borderColor: 'gray', borderWidth: 1, alignSelf: 'center' }}
+        onChangeText={text => setMaxIng(text)}
+        placeholder={"#Ings"}
+      />
       <Picker
         selectedValue={mealType.searchMealType}
-        mode={'dropdown'}
-        style={{ height: 50, width: 400, alignContent: 'center' }}
+        mode={'dialog'}
+        style={{ height: 50, width: 200, alignSelf: 'center' }}
         onValueChange={(itemValue, itemIndex) => {
           mealType.changeMeal(itemValue)
         }
@@ -184,25 +206,9 @@ const SearchView = () => {
                     key={index}
                     onPress={() => {
                       submitMeal(mealObject,
-                        Mealtypes = mealRef.current)
+                        mealTime = mealRef.current)
                     }}
                   ></SearchMealCard>
-                  {/* <FirestoreMutation path={"/meals"} type="add">
-                    {({ runMutation }) => (
-                      <SearchMealCard
-                        mealObject={mealObject}
-                        key={index}
-                        onPress={() => {
-                          runMutation({
-                            ...mealObject,
-                            MealType: mealRef.current
-                          }).then(res => {
-                            onSearch(searchedText)
-                          });
-                        }}
-                      ></SearchMealCard>
-                    )}
-                  </FirestoreMutation> */}
                 </View>
               </View>
             )

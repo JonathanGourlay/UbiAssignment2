@@ -1,24 +1,14 @@
 
 import React from "react";
-import firestore from '@react-native-firebase/firestore';
-import { View, SectionList, StyleSheet, Text, Dimensions, Button, FlatList } from "react-native";
-import { useContainer } from "unstated-next";
-import RecipiesGet from "../Scripts/GetRandomRecipies";
+import { View, StyleSheet, Dimensions, Button } from "react-native";
 import firebase from "firebase";
-// import "firebase/auth";
-import { firebaseConfig } from "../Utils/Firebase";
 import "firebase/firestore";
-import { FirestoreProvider, FirestoreMutation, FirestoreDocument, FirestoreCollection } from "@react-firebase/firestore";
-import { render } from "react-dom";
-import { MealCard } from '../Components/MealCard';
-import { MealModal } from '../Components/MealModal';
 
 export const GenerateMealPlan = () => {
-    const [state, setState] = React.useState([]);
+    const [] = React.useState([]);
     const mealBreakfastArray = [];
     const mealLunchArray = [];
     const mealDinnerArray = [];
-    const mealPlanArray = [];
 
     React.useEffect(() => {
         firebase.firestore().collection('/meals/').where('MealType', '==', 'Breakfast').get().then((res) => { res.forEach((meal) => { mealBreakfastArray.push(meal.data()) }) });
@@ -117,18 +107,4 @@ export const GenerateMealPlan = () => {
     );
 }
 
-const styles = StyleSheet.create({
-    item: {
-        backgroundColor: "#f9c2ff",
-        padding: 20,
-        marginVertical: 8
-    },
-    header: {
-        fontSize: 32,
-        backgroundColor: "#fff",
-        width: Dimensions.get('screen').width
-    },
-    title: {
-        fontSize: 24
-    }
-});
+

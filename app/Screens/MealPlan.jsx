@@ -1,27 +1,16 @@
 
 import React from "react";
-import firestore from '@react-native-firebase/firestore';
-import { View, SectionList, StyleSheet, Text, Dimensions, Button, FlatList } from "react-native";
-import { useContainer } from "unstated-next";
-import RecipiesGet from "../Scripts/GetRandomRecipies";
+import { View, StyleSheet, Dimensions, FlatList, LogBox } from "react-native";
 import firebase from "firebase/app";
-// import "firebase/auth";
-import { firebaseConfig } from "../Utils/Firebase";
 import "firebase/firestore";
-import { FirestoreProvider, FirestoreMutation, FirestoreDocument } from "@react-firebase/firestore";
-import { render } from "react-dom";
 import { GenerateMealPlan } from "../Components/GenerateMealPlan";
 import { MealPlanCard } from '../Components/MealCard';
 import { MealModal } from '../Components/MealModal';
-import { SafeAreaView } from "react-native";
-// import mealObject from '../Objects/MealObject';
-
-
-
+LogBox.ignoreLogs(['VirtualizedList:']);
 export const MealPlan = () => {
     const [state, setState] = React.useState([]);
     const [modalVisible, setModalVisible] = React.useState(false)
-    const [selectedMeal, setSelectedMeal] = React.useState();
+    const [selectedMeal] = React.useState();
 
     // if no meal plan -> button to generate meal plan
     // if meal plan is out of date generate new meal plan
@@ -45,7 +34,8 @@ export const MealPlan = () => {
                         return (
                             <MealPlanCard
                                 mealObject={item.mealPlan}
-                                key={index}
+                                // key={index}
+                                // keyExtractor={(item, index) => index.toString()}
                                 onPress={() => {
                                 }}
                             ></MealPlanCard>

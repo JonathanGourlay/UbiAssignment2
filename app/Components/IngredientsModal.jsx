@@ -62,7 +62,7 @@ export const IngredientsModal = ({ selectedMeal, visible, setModalVisible }) => 
                         </Text>
                             {JSON.parse(selectedMeal.meal.Ingredients).map((ingSet, index) => {
                                 return (
-                                    <View>
+                                    <View key={index}>
                                         <View>
                                             <Text style={{
                                                 color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text, alignSelf: 'flex-start',

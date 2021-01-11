@@ -84,7 +84,7 @@ export const MealModal = ({ selectedMeal, visible, setModalVisible }) => {
                                     <CollapsibleView title="Ingredients" arrowStyling={{ size: 32, rounded: true, thickness: 8, color: "purple" }} style={themeSwitch.theme === "dark" ? styles.light_label : styles.dark_label, { borderRadius: 6, borderWidth: 0 }}>
                                         {JSON.parse(selectedMeal.meal.Ingredients).map((ingSet, index) => {
                                             return (
-                                                <View >
+                                                <View key={index}>
                                                     <View>
                                                         <Text style={{
                                                             color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text, alignSelf: 'flex-start',
@@ -117,7 +117,7 @@ export const MealModal = ({ selectedMeal, visible, setModalVisible }) => {
 
                                             {Object.keys(selectedMeal.meal.TotalNutrients).map((nutType, index) => {
                                                 return (
-                                                    <View>
+                                                    <View key={index}>
                                                         <View>
                                                             <Text style={{
                                                                 color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text, alignSelf: 'flex-start',
@@ -144,7 +144,7 @@ export const MealModal = ({ selectedMeal, visible, setModalVisible }) => {
                                         <CollapsibleView title="Diet Labels" arrowStyling={{ size: 32, rounded: true, thickness: 8, color: "purple" }} style={themeSwitch.theme === "dark" ? styles.light_label : styles.dark_label, { borderRadius: 6, borderWidth: 0 }}>
                                             {((selectedMeal.meal.DietLabels).replace(/\\/g, "")).replace(/[\[\]'"]+/g, "").split(",").map((dietLabel, index) => {
                                                 return (
-                                                    <View>
+                                                    <View key={index}>
                                                         <View>
                                                             <Text style={{
                                                                 color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text, alignSelf: 'flex-start',
@@ -172,7 +172,7 @@ export const MealModal = ({ selectedMeal, visible, setModalVisible }) => {
                                         <CollapsibleView title="Health Labels" arrowStyling={{ size: 32, rounded: true, thickness: 8, color: "purple" }} style={themeSwitch.theme === "dark" ? styles.light_label : styles.dark_label, { borderRadius: 6, borderWidth: 0 }}>
                                             {((selectedMeal.meal.HealthLabels).replace(/\\/g, "")).replace(/[\[\]'"]+/g, "").split(",").map((healthLabel, index) => {
                                                 return (
-                                                    <View>
+                                                    <View key={index}>
                                                         <View>
                                                             <Text style={{
                                                                 color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text, alignSelf: 'flex-start',

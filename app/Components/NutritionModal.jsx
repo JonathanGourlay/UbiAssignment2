@@ -62,7 +62,7 @@ export const NutritionModal = ({ selectedMeal, visible, setModalVisible }) => {
                         </Text>
                             {Object.keys(selectedMeal.meal.TotalNutrients).map((nutType, index) => {
                                 return (
-                                    <View>
+                                    <View key={index}>
                                         <View>
                                             <Text style={{
                                                 color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text, alignSelf: 'flex-start',

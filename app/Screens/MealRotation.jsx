@@ -1,18 +1,11 @@
 
 import React from "react";
-import firestore from '@react-native-firebase/firestore';
-import { View, SectionList, StyleSheet, Text, Dimensions, Button, FlatList } from "react-native";
-import { useContainer } from "unstated-next";
-import RecipiesGet from "../Scripts/GetRandomRecipies";
+import { View, StyleSheet, Dimensions, FlatList } from "react-native";
 import firebase from "firebase";
 // import "firebase/auth";
-import { firebaseConfig } from "../Utils/Firebase";
 import "firebase/firestore";
-import { FirestoreProvider, FirestoreMutation, FirestoreDocument, FirestoreCollection } from "@react-firebase/firestore";
-import { render } from "react-dom";
 import { MealCard } from '../Components/MealCard';
 import { MealModal } from '../Components/MealModal';
-import { IngredientsModal } from "../Components/IngredientsModal";
 // import mealObject from '../Objects/MealObject';
 
 
@@ -36,11 +29,13 @@ export const MealRotation = () => {
                     style={styles.container}
                     horizontal={false}
                     data={state}
+
                     renderItem={({ item, index }) => {
                         return (
                             <MealCard
                                 mealObject={item}
                                 key={index}
+                                keyExtractor={index + (index / 0.2)}
                                 onPress={() => {
                                     setModalVisible(true)
                                     setSelectedMeal(item)
@@ -56,11 +51,6 @@ export const MealRotation = () => {
                 visible={modalVisible}
                 setModalVisible={setModalVisible}
             />
-            {/* <IngredientsModal
-                selectedMeal={selectedMeal}
-                visible={modalVisible}
-                setModalVisible={setModalVisible}
-            /> */}
         </View>
     );
 }

@@ -3,35 +3,24 @@ import {
     View,
     StyleSheet,
     Text,
-    Dimensions,
-    Image,
-    Linking
+    Dimensions
 } from "react-native";
 import firebase from "firebase/app";
-// import "firebase/auth";
 import "firebase/firestore";
 import { SafeAreaView } from "react-native";
 import { mealTypePriority } from "../Utils/constants";
-import { round } from "react-native-reanimated";
 import { ScrollView } from "react-native";
 import { MealModal } from '../Components/MealModal';
-import { ThemeSwitch } from '../Scripts/GlobalState';
 import themeOptions from '../Objects/ThemesObjects';
-// import mealObject from '../Objects/MealObject';
 
-// Item = ({ title }) => (
-//     <View style={styles.item}>
-//         <Text style={styles.title}>{title}</Text>
-//     </View>
-// );
+import { DailyMealcard } from "../Components/MealCard";
 
 export const DailyMeals = () => {
     const [state, setState] = React.useState();
     const [modalVisible, setModalVisible] = React.useState(false)
     const [selectedMeal, setSelectedMeal] = React.useState();
     // const [] = React.useState(false);
-    const [imageLoading, setImageLoading] = React.useState();
-    let themeSwitch = ThemeSwitch.useContainer();
+    const [] = React.useState();
     // const [] = React.useState();
 
     var dayNum = new Date();
@@ -96,50 +85,11 @@ export const DailyMeals = () => {
 
                     return (
                         <SafeAreaView key={index} style={styles.container}>
-
-                            <View style={styles.container}>
-                                <Text style={styles.large_title}>{mealType.MealType}</Text>
-                                <Text style={styles.title}>
-                                    {mealType.meal.Name}
-                                </Text>
-                                {Object.keys(mealType.meal.TotalNutrients).map((nutType, index) => {
-                                    return (
-                                        <View>
-                                            <View>
-                                                <Text style={{
-                                                    color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text,
-                                                    ...styles.smaller_title
-                                                }}
-                                                    key={index}>
-                                                    {mealType.meal.TotalNutrients[nutType].Label + " : " + mealType.meal.TotalNutrients[nutType].Quantity.toFixed(2) / mealType.meal.Serves.toFixed(2) + " " + mealType.meal.TotalNutrients[nutType].Unit}
-                                                </Text>
-                                            </View>
-                                            <View>
-                                            </View>
-                                        </View>
-                                    )
-
-                                })}
-                                <Text style={styles.smaller_title}>
-                                    {(
-                                        mealType.meal.Calories /
-                                        mealType.meal.Serves
-                                    ).toFixed(2) + " - Calories"}
-                                </Text>
-
-                            </View>
-                            <Image
-                                style={[styles.logo, imageLoading && { display: "none" }]}
-                                source={{ uri: mealType.meal.ImageString }}
+                            <DailyMealcard
+                                mealObject={mealType}
+                                setModalVisible={setModalVisible}
+                                setSelectedMeal={setSelectedMeal}
                             />
-                            <Text style={themeSwitch.theme === "dark" ? styles.light_label : styles.dark_label}
-                                onPress={() => {
-                                    setModalVisible(true)
-                                    setSelectedMeal(mealType)
-                                }}
-                            >
-                                More Info
-                            </Text>
                         </SafeAreaView>
                     );
                 })}
