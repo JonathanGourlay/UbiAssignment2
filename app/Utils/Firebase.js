@@ -1,5 +1,5 @@
-import firebase from "firebase/app";
-
+import firebase from "firebase";
+import "firebase/auth";
 export const firebaseConfig = {
   apiKey: "AIzaSyB2e_5cd3McLtJV5TB1sLj3hWDdkC3Q6Qg",
   authDomain: "ubi-assignment-2-1.firebaseapp.com",

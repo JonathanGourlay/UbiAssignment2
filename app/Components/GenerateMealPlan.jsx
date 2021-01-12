@@ -3,6 +3,7 @@ import React from "react";
 import { View, StyleSheet, Dimensions, Button } from "react-native";
 import firebase from "firebase";
 import "firebase/firestore";
+import "firebase/auth"
 
 export const GenerateMealPlan = () => {
     const [] = React.useState([]);
@@ -11,11 +12,12 @@ export const GenerateMealPlan = () => {
     const mealDinnerArray = [];
 
     React.useEffect(() => {
-        firebase.firestore().collection('/meals/').where('MealType', '==', 'Breakfast').get().then((res) => { res.forEach((meal) => { mealBreakfastArray.push(meal.data()) }) });
-        firebase.firestore().collection('/meals/').where('MealType', '==', 'Lunch').get().then((res) => { res.forEach((meal) => { mealLunchArray.push(meal.data()) }) });
-        firebase.firestore().collection('/meals/').where('MealType', '==', 'Dinner').get().then((res) => { res.forEach((meal) => { mealDinnerArray.push(meal.data()) }) });
+        firebase.firestore().collection('/meals/').where('mealTime', '==', 'Breakfast').get().then((res) => { res.forEach((meal) => { mealBreakfastArray.push(meal.data()) }) });
+        firebase.firestore().collection('/meals/').where('mealTime', '==', 'Lunch').get().then((res) => { res.forEach((meal) => { mealLunchArray.push(meal.data()) }) });
+        firebase.firestore().collection('/meals/').where('mealTime', '==', 'Dinner').get().then((res) => { res.forEach((meal) => { mealDinnerArray.push(meal.data()) }) });
     }, [])
     const submitMealPlan = (mealPlan, created) => {
+        firebase.auth().s
         firebase.firestore().collection("/mealPlans").add({
             mealPlan,
             created
@@ -23,6 +25,7 @@ export const GenerateMealPlan = () => {
 
         })
     }
+
 
     return (
         <View style={{ flex: 0.2, justifyContent: 'center', alignItems: 'center' }}>

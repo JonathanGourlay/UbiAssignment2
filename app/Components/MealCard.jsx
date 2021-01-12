@@ -4,6 +4,7 @@ import { mealTypePriority } from "../Utils/constants";
 import { ThemeSwitch } from '../Scripts/GlobalState';
 import themeOptions from '../Objects/ThemesObjects';
 import "firebase/firestore";
+import { set } from "react-native-reanimated";
 
 
 const MealCard = (props) => {
@@ -42,13 +43,11 @@ const SearchMealCard = (props) => {
 }
 const DailyMealCard = ({ mealObject, setModalVisible, setSelectedMeal }) => {
     let themeSwitch = ThemeSwitch.useContainer();
-    // const [modalVisible, setModalVisible] = React.useState(false)
-    // const [selectedMeal, setSelectedMeal] = React.useState();
     return (
         <View >
 
             <View >
-                <Text style={styles.large_title}>{mealObject.MealType}</Text>
+                <Text style={styles.large_title}>{mealObject.mealTime}</Text>
                 <Text style={styles.title}>
                     {mealObject.meal.Name}
                 </Text>
@@ -96,55 +95,66 @@ const DailyMealCard = ({ mealObject, setModalVisible, setSelectedMeal }) => {
 
     )
 }
-const MealPlanCard = (props) => {
-    var totalMealPlanCal = 0.00;
+const MealPlanCard = ({ day, meals, setModalVisible, setSelectedDayPlan }) => {
+    let themeSwitch = ThemeSwitch.useContainer();
+
+    let totalDailyCal = 0.00;
+    totalDailyCal = Object.keys(meals).reduce((acc, meal) => acc = parseFloat(acc) + parseFloat(parseFloat(meals[meal].meal.Calories.toFixed(2)) / parseFloat(meals[meal].meal.Serves).toFixed(2)), 0)
+
     return (
-        <View style={{ flex: 0.1 }}>
-            <View onTouchEnd={() => {
-                props.onPress();
-            }}>
-                {Object.keys(props.mealObject).map((dayPlan, index) => {
-                    let totalDailyCal = 0.00;
-                    totalDailyCal = Object.keys(props.mealObject[dayPlan].meals).reduce((acc, meal) => acc = parseFloat(acc) + parseFloat(parseFloat(props.mealObject[dayPlan].meals[meal].meal.Calories.toFixed(2)) / parseFloat(props.mealObject[dayPlan].meals[meal].meal.Serves).toFixed(2)), 0)
-                    totalMealPlanCal += totalDailyCal
-                    return (
-                        <View key={index} style={styles.container}>
-                            <Text style={styles.title}>
-                                {props.mealObject[dayPlan].day}
-                            </Text>
-                            {Object.keys(props.mealObject[dayPlan].meals).sort((a, b) => {
-                                return mealTypePriority[a] - mealTypePriority[b];
-                            }).map((mealType, index) => {
-                                return (
-                                    <View key={index}>
-                                        <Text style={styles.small_title}>
-                                            {props.mealObject[dayPlan].meals[mealType].MealType}
-                                        </Text>
-                                        <Text style={styles.smaller_title}>
-                                            {props.mealObject[dayPlan].meals[mealType].meal.Name}
-                                        </Text>
-                                        <Text style={styles.smaller_title}>
-                                            {(props.mealObject[dayPlan].meals[mealType].meal.Calories / props.mealObject[dayPlan].meals[mealType].meal.Serves).toFixed(2) + " - Calories"}
-                                        </Text>
-                                    </View>
-                                )
-                            })}
-                            <Text style={styles.title}>
-                                {totalDailyCal.toFixed(2) + " - Total Calories"}
-                            </Text>
-                        </View>
-                    )
-                })}
-                <View style={styles.container}>
-                    <Text style={styles.title}>
-                        {totalMealPlanCal.toFixed(2) + " - Total Weeks Calories"}
-                    </Text>
-                </View>
-            </View>
+        <View style={styles.container}>
+            <Text style={styles.title}>
+                {day}
+            </Text>
+            {Object.keys(meals).sort((a, b) => {
+                return mealTypePriority[a] - mealTypePriority[b];
+            }).map((mealTime, index) => {
+                return (
+                    <View key={index}>
+                        <Text style={styles.small_title}>
+                            {meals[mealTime].mealTime}
+                        </Text>
+                        <Text style={styles.smaller_title}>
+                            {meals[mealTime].meal.Name}
+                        </Text>
+                        <Text style={styles.smaller_title}>
+                            {(meals[mealTime].meal.Calories / meals[mealTime].meal.Serves).toFixed(2) + " - Calories"}
+                        </Text>
+                    </View>
+                )
+            })}
+            <Text style={styles.title}>
+                {totalDailyCal.toFixed(2) + " - Total Calories"}
+            </Text>
+            {!day || !meals ? <Text style={themeSwitch.theme === "dark" ? styles.light_label : styles.dark_label}
+                onPress={() => {
+                    setSelectedDayPlan({ day: day, meals: meals })
+                    setModalVisible(true)
+                }}>
+                Create Plan</Text> : <Text style={themeSwitch.theme === "dark" ? styles.light_label : styles.dark_label}
+                    onPress={() => {
+                        setSelectedDayPlan({ day: day, meals: meals })
+                        setModalVisible(true)
+                    }}>
+                    Edit Plan</Text>}
+
         </View>
     )
 
+
+    // <View style={{ flex: 0.1 }}>
+    //     {Object.keys(mealObject).map((dayPlan, index) => {
+
+    //     })}
+    //     <View style={styles.container}>
+    //         <Text style={styles.title}>
+    //             {totalMealPlanCal.toFixed(2) + " - Total Weeks Calories"}
+    //         </Text>
+    //     </View>
+    // </View>
+
 }
+
 const styles = StyleSheet.create({
     dark_label: {
         color: themeOptions.dark_theme.text,

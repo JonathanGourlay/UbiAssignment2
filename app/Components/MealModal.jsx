@@ -3,7 +3,6 @@ import { Text, View, Modal, StyleSheet, Image, Animated, Linking } from "react-n
 import { ThemeSwitch } from '../Scripts/GlobalState';
 import themeOptions from '../Objects/ThemesObjects';
 import { ScrollView } from "react-native";
-import { IngredientsModal } from "./IngredientsModal";
 import { NutritionModal } from "./NutritionModal";
 import CollapsibleView from "@eliav2/react-native-collapsible-view";
 

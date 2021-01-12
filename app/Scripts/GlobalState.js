@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { createContainer } from "unstated-next";
+import { GetUserIdToken } from "../Utils/Firebase";
 
 function useThemeSwitch() {
   let [theme, setTheme] = React.useState("dark");
@@ -24,6 +25,7 @@ function useMealType() {
 
   return { searchMealType, setSearchMealType, changeMeal };
 }
+
 function useSearchObject() {
   const [searchObject, setSearchObject] = React.useState();
   const changeSearch = (newSearch) => {
@@ -59,11 +61,54 @@ function useColourSwitch() {
 
   return { pickedColour, switchColour };
 }
+function AuthedState() {
+  const [token, setToken] = React.useState();
+  const [isAdmin, setIsAdmin] = React.useState(false);
+
+  const tryGetToken = () => {
+    GetUserIdToken()
+      .then((res) => setToken(res))
+      .catch((err) => {
+        console.log({ err });
+      });
+  };
+
+  React.useEffect(() => {
+    tryGetToken();
+  }); // run each time, as passed no deps
+
+  React.useEffect(() => {
+    if (token !== undefined) {
+      const results = apiClient.isAdmin(token).then((response) => {
+        console.log(results);
+        setIsAdmin(response);
+      });
+    } else {
+      setIsAdmin(false);
+    }
+  }, [token]); // run when token changes
+
+  return {
+    token,
+    setToken,
+    isAdmin,
+    setIsAdmin,
+    tryGetToken,
+  };
+}
 
 const ThemeSwitch = createContainer(useThemeSwitch);
 const ColourSwitch = createContainer(useColourSwitch);
 const MealArray = createContainer(useFirestoreArray);
 const MealType = createContainer(useMealType);
 const SearchObject = createContainer(useSearchObject);
+const IsAuthed = createContainer(AuthedState);
 
-export { ThemeSwitch, ColourSwitch, MealArray, MealType, SearchObject };
+export {
+  ThemeSwitch,
+  ColourSwitch,
+  MealArray,
+  MealType,
+  SearchObject,
+  IsAuthed,
+};

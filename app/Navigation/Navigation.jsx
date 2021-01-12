@@ -52,7 +52,7 @@ export default Navigation = () => {
                         ),
                     }}
                 />
-                <Tab.Screen
+                {/* <Tab.Screen
                     name="Nutritional Dashboard"
                     component={MealPlan}
                     options={{
@@ -61,7 +61,7 @@ export default Navigation = () => {
                             <MaterialCommunityIcons name="view-dashboard" color={color} size={26} />
                         ),
                     }}
-                />
+                /> */}
 
                 <Tab.Screen
                     name="Search Recipes"
