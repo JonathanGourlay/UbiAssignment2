@@ -14,8 +14,8 @@ const themeOptions = {
     },
     light_theme: {
         ...DefaultTheme,
-        background: '#7AE1E1',
-        primary_colour: '#e17a7a',
+        background: '#78909c',
+        primary_colour: '#d7d7d7',
         secondary_colour: '#fca311',
         text: '#000000',
     },

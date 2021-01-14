@@ -1,11 +1,9 @@
 import React from 'react';
 import { SearchBar } from 'react-native-elements';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { FlatList, StyleSheet, View, SectionList, Text, Button, TextInput } from "react-native";
+import { FlatList, StyleSheet, View, Text, TextInput } from "react-native";
 import { useBackHandler } from '@react-native-community/hooks'
-import { FirestoreProvider, FirestoreMutation, FirestoreDocument } from "@react-firebase/firestore";
 import firebase from "firebase/app";
-import { firebaseConfig } from "../Utils/Firebase";
 import {
   useTheme,
 } from "@react-navigation/native";
@@ -14,14 +12,16 @@ import { SearchMealCard } from '../Components/MealCard';
 import Slider from '@react-native-community/slider';
 import { Picker } from '@react-native-picker/picker';
 import { MealType } from '../Scripts/GlobalState';
-import { RefreshControl } from 'react-native';
+import themeOptions from "../Objects/ThemesObjects";
+import { ThemeSwitch } from '../Scripts/GlobalState';
 
 const SearchView = () => {
+  let themeSwitch = ThemeSwitch.useContainer()
   let mealType = MealType.useContainer();
   let themeType = useTheme();
   const [searchedText, setSearchedText] = React.useState();
-  const [calRange, setCalRage] = React.useState({ min: 0, max: 9000 })
-  const [maxIng, setMaxIng] = React.useState(40)
+  const [calRange, setCalRage] = React.useState({ min: 0, max: 900 })
+  const [maxIng, setMaxIng] = React.useState(20)
   const [state, setState] = React.useState([]);
   const [searchNum, setSearchNum] = React.useState(30);
   const mealRef = React.useRef(mealType.searchMealType)
@@ -38,6 +38,7 @@ const SearchView = () => {
     mealRef.current = mealType.searchMealType
   }, [mealType.searchMealType], searchedText)
 
+  // this function implements the recipe api and sets the results to state
   const RunSearch = (searchParam) => {
     if (searchParam !== "" && searchParam !== undefined) {
       fetch(
@@ -45,8 +46,7 @@ const SearchView = () => {
         {
           method: "GET",
           headers: {
-            "x-rapidapi-key":
-              "556a386896mshfd4d7315b36e51fp123a6djsn8e1e733f188d",
+            "x-rapidapi-key": "fcab2884efmshcb398188cc20127p177c84jsn077d9db8e6c4",
             "x-rapidapi-host": "edamam-recipe-search.p.rapidapi.com",
           },
         })
@@ -62,6 +62,8 @@ const SearchView = () => {
   const onSubmit = (text) => {
     RunSearch(text);
   }
+
+  // this function semd the meal to firebase
   const submitMeal = (mealObject, mealTime) => {
     firebase.firestore().collection("/meals").add({
       ...mealObject,
@@ -87,7 +89,10 @@ const SearchView = () => {
         lightTheme={themeType.dark}
         round
       />
-      <Text style={{ height: 20, alignSelf: 'center' }}>Number of recipies to search{" - " + searchNum}</Text>
+      <Text style={{
+        color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text,
+        ...styles.smaller_title, textAlign: 'center', height: 20, alignSelf: 'center'
+      }}>Number of recipies to search{" - " + searchNum}</Text>
       <Slider
         style={{ width: 400, height: 40 }}
         minimumValue={5}
@@ -98,41 +103,65 @@ const SearchView = () => {
         step={5}
         onSlidingComplete={(num) => { setSearchNum(num) }}
       />
-      <Text style={{ height: 20, alignSelf: 'center' }}>Range of calories to filter by</Text>
-      <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+        <View style={{ flexDirection: 'column' }}>
+          <Text style={{
+            color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text,
+            ...styles.smaller_title, textAlign: 'center', height: 20, alignSelf: 'center'
+          }}>Range of calories to filter by</Text>
+          <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
 
-        <TextInput
-          keyboardType='number-pad'
-          style={{ height: 40, width: 50, padding: 10, borderColor: 'gray', borderWidth: 1, alignSelf: 'center' }}
-          onChangeText={text => setCalRage({ min: text, max: calRange.max })}
-          placeholder={"Min"}
-        />
-        <TextInput
-          keyboardType='number-pad'
-          style={{ height: 40, width: 50, padding: 10, borderColor: 'gray', borderWidth: 1, alignSelf: 'center' }}
-          onChangeText={text => setCalRage({ min: calRange.min, max: text })}
-          placeholder={"Max"}
-        />
+            <TextInput
+              keyboardType='number-pad'
+              style={{ height: 40, width: 50, padding: 10, borderColor: 'gray', borderWidth: 1, alignSelf: 'center', color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text }}
+              onChangeText={text => setCalRage({ min: text, max: calRange.max })}
+              placeholderTextColor='red'
+              selectionColor='red'
+              placeholder={"Min"}
+            />
+            <TextInput
+              keyboardType='number-pad'
+              style={{ height: 40, width: 50, padding: 10, borderColor: 'gray', borderWidth: 1, alignSelf: 'center', color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text }}
+              onChangeText={text => setCalRage({ min: calRange.min, max: text })}
+              placeholder={"Max"}
+              placeholderTextColor='red'
+              selectionColor='red'
+            />
+          </View>
+        </View>
+        <View style={{
+          color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text,
+          ...styles.smaller_title, textAlign: 'center', height: 20, alignSelf: 'center'
+        }}>
+          <Text style={{ height: 20, alignSelf: 'center' }}>Max ingredients</Text>
+          <TextInput
+            keyboardType='number-pad'
+            style={{ height: 40, width: 50, padding: 10, borderColor: 'gray', borderWidth: 1, alignSelf: 'center', color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text }}
+            onChangeText={text => setMaxIng(text)}
+            placeholderTextColor='red'
+            selectionColor='red'
+            placeholder={"#Ings"}
+          />
+        </View>
       </View>
-      <Text style={{ height: 20, alignSelf: 'center' }}>Max number of ingredients</Text>
-      <TextInput
-        keyboardType='number-pad'
-        style={{ height: 40, width: 50, padding: 10, borderColor: 'gray', borderWidth: 1, alignSelf: 'center' }}
-        onChangeText={text => setMaxIng(text)}
-        placeholder={"#Ings"}
-      />
-      <Picker
-        selectedValue={mealType.searchMealType}
-        mode={'dialog'}
-        style={{ height: 50, width: 200, alignSelf: 'center' }}
-        onValueChange={(itemValue, itemIndex) => {
-          mealType.changeMeal(itemValue)
-        }
-        }>
-        <Picker.Item label="Dinner" value="Dinner" />
-        <Picker.Item label="Lunch" value="Lunch" />
-        <Picker.Item label="Breakfast" value="Breakfast" />
-      </Picker>
+      <View style={{ borderRadius: 20 }}>
+        <Text style={{
+          color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text,
+          textAlign: 'center', height: 20,
+        }}>Meal Type</Text>
+        <Picker
+          selectedValue={mealType.searchMealType}
+          mode={'dialog'}
+          style={{ height: 50, width: Dimensions.get('screen').width - 30, alignSelf: 'flex-start', color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text }}
+          onValueChange={(itemValue) => {
+            mealType.changeMeal(itemValue)
+          }
+          }>
+          <Picker.Item label="Dinner" value="Dinner" />
+          <Picker.Item label="Lunch" value="Lunch" />
+          <Picker.Item label="Breakfast" value="Breakfast" />
+        </Picker>
+      </View>
 
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <FlatList
@@ -230,6 +259,51 @@ const styles = StyleSheet.create({
   },
   searchBarDark: {
     backgroundColor: 'green'
+  },
+  dark_label: {
+    color: themeOptions.dark_theme.text,
+    margin: 20,
+    padding: 15,
+    backgroundColor: themeOptions.dark_theme.secondary_colour,
+    color: themeOptions.light_theme.text,
+    borderRadius: 6,
+    alignSelf: 'center',
+    textAlign: 'center',
+    flex: 0.3,
+    marginTop: 10,
+    width: Dimensions.get("window").width - 50,
+
+  },
+  light_label: {
+    color: themeOptions.light_theme.text,
+    margin: 20,
+    padding: 15,
+    backgroundColor: themeOptions.light_theme.secondary_colour,
+    borderRadius: 6,
+    alignSelf: 'center',
+    textAlign: 'center',
+    flex: 0.3,
+    marginTop: 10,
+    width: Dimensions.get("window").width - 10,
+
+  },
+  dark_container: {
+    backgroundColor: themeOptions.dark_theme.primary_colour,
+    flex: 0.3,
+    marginTop: 10,
+    width: Dimensions.get("window").width - 10,
+    borderRadius: 5,
+    padding: 20,
+
+  },
+  light_container: {
+    backgroundColor: themeOptions.light_theme.primary_colour,
+    flex: 0.3,
+    marginTop: 10,
+    width: Dimensions.get("window").width - 10,
+    borderRadius: 5,
+    padding: 20,
+
   },
 });
 

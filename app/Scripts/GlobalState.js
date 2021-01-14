@@ -63,7 +63,6 @@ function useColourSwitch() {
 }
 function AuthedState() {
   const [token, setToken] = React.useState();
-  const [isAdmin, setIsAdmin] = React.useState(false);
 
   const tryGetToken = () => {
     GetUserIdToken()
@@ -77,22 +76,9 @@ function AuthedState() {
     tryGetToken();
   }); // run each time, as passed no deps
 
-  React.useEffect(() => {
-    if (token !== undefined) {
-      const results = apiClient.isAdmin(token).then((response) => {
-        console.log(results);
-        setIsAdmin(response);
-      });
-    } else {
-      setIsAdmin(false);
-    }
-  }, [token]); // run when token changes
-
   return {
     token,
     setToken,
-    isAdmin,
-    setIsAdmin,
     tryGetToken,
   };
 }

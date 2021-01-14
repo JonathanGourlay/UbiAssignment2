@@ -2,11 +2,9 @@
 import React from "react";
 import { View, StyleSheet, Dimensions, FlatList } from "react-native";
 import firebase from "firebase";
-// import "firebase/auth";
 import "firebase/firestore";
 import { MealCard } from '../Components/MealCard';
 import { MealModal } from '../Components/MealModal';
-// import mealObject from '../Objects/MealObject';
 
 
 
@@ -16,10 +14,13 @@ export const MealRotation = () => {
     const [selectedMeal, setSelectedMeal] = React.useState();
     const mealArray = [];
 
+    // run once on inital render
     React.useEffect(() => {
-        firebase.firestore().collection('/meals/').get().then((res) => { res.forEach((meal) => { mealArray.push(meal.data()) }); setState(mealArray) });
-    }, [])
-
+        (async () => {
+            const result = await firebase.firestore().collection('/meals/').get()
+            result.forEach((meal) => { mealArray.push(meal.data()) }); setState(mealArray)
+        })();
+    }, []);
 
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

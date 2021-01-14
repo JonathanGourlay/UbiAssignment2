@@ -7,22 +7,21 @@ import {
 } from "react-native";
 import firebase from "firebase/app";
 import "firebase/firestore";
-import { SafeAreaView } from "react-native";
 import { mealTypePriority } from "../Utils/constants";
 import { ScrollView } from "react-native";
 import { MealModal } from '../Components/MealModal';
 import themeOptions from '../Objects/ThemesObjects';
-
+import { ThemeSwitch } from "../Scripts/GlobalState";
+import { IsAuthed } from "../Scripts/GlobalState";
 import { DailyMealcard } from "../Components/MealCard";
 
 export const DailyMeals = () => {
     const [state, setState] = React.useState();
     const [modalVisible, setModalVisible] = React.useState(false)
     const [selectedMeal, setSelectedMeal] = React.useState();
-    // let themeSwitch = ThemeSwitch.useContainer();
-    // const [] = React.useState(false);
+    let { token } = IsAuthed.useContainer();
+    let themeSwitch = ThemeSwitch.useContainer();
     const [] = React.useState();
-    // const [] = React.useState();
 
     var dayNum = new Date();
     dayNum = dayNum.getDay();
@@ -35,19 +34,19 @@ export const DailyMeals = () => {
     var totalDayPlanFiber = 0.00;
     var totalDayPlanChol = 0.00;
 
+    // run once on initial render
     React.useEffect(() => {
-        firebase
-            .firestore()
-            .collection("/mealPlans/")
-            .orderBy("created", "desc")
-            .limit(1)
-            .get()
-            .then((res) => {
-                // have to loop through
-                // object is collection, howerver limit is 1, 
-                // so setState only called once
+        if (token) {
+            (async () => {
+                const result = await firebase
+                    .firestore()
+                    .collection("/mealPlans/")
+                    .orderBy("created", "desc")
+                    .where("uid", "==", token)
+                    .limit(1)
+                    .get();
 
-                res.forEach((mealPlan) => {
+                result.forEach((mealPlan) => {
                     const day = mealPlan.get("mealPlan." + dayNum)
                     let sortedMeals = Object.keys(day.meals).sort((a, b) => {
                         return mealTypePriority[a] - mealTypePriority[b];
@@ -55,13 +54,12 @@ export const DailyMeals = () => {
                         return day.meals[key]
                     })
                     setState(sortedMeals);
-                });
-            })
-            .catch((err) => console.log(err))
-
+                })
+            })();
+        }
     }, []);
 
-
+    // return null so the content is not displayed
     if (state === undefined) { return null; }
 
     return (
@@ -70,7 +68,6 @@ export const DailyMeals = () => {
                 flex: 1,
                 flexDirection: "column",
                 alignSelf: "auto",
-                marginTop: 60,
             }}
         >
             <ScrollView>
@@ -85,36 +82,36 @@ export const DailyMeals = () => {
                     totalDayPlanChol += mealType.meal.TotalNutrients.TotalCholesterol.Quantity / mealType.meal.Serves
 
                     return (
-                        <SafeAreaView key={index} style={styles.container}>
-                            <DailyMealcard
-                                mealObject={mealType}
-                                setModalVisible={setModalVisible}
-                                setSelectedMeal={setSelectedMeal}
-                            />
-                        </SafeAreaView>
+
+                        <DailyMealcard
+                            key={index}
+                            mealObject={mealType}
+                            setModalVisible={setModalVisible}
+                            setSelectedMeal={setSelectedMeal}
+                        />
                     );
                 })}
-                <View style={styles.container}>
+                <View style={themeSwitch.theme === "dark" ? styles.light_container : styles.dark_container}>
                     <Text style={styles.title}>
-                        {totalDayPlanCal.toFixed(2) + " - Total Day's Calories / 2000 kcal"}
+                        {"Calories: " + totalDayPlanCal.toFixed(2) + " / 2000 kcal"}
                     </Text>
                     <Text style={styles.title}>
-                        {totalDayPlanFat.toFixed(2) + " - Total Day's Fats / 70g"}
+                        {"Fats: " + totalDayPlanFat.toFixed(2) + " / 70g"}
                     </Text>
                     <Text style={styles.title}>
-                        {totalDayPlanCarbs.toFixed(2) + " - Total Day's Carbs / 300g "}
+                        {"Carbs: " + totalDayPlanCarbs.toFixed(2) + " / 300g "}
                     </Text>
                     <Text style={styles.title}>
-                        {totalDayPlanSugar.toFixed(2) + " - Total Day's Sugars / 50g"}
+                        {"Sugars: " + totalDayPlanSugar.toFixed(2) + " / 50g"}
                     </Text>
                     <Text style={styles.title}>
-                        {totalDayPlanChol.toFixed(2) + " - Total Day's Cholesterol / 300mg"}
+                        {"Cholesterol: " + totalDayPlanChol.toFixed(2) + " / 300mg"}
                     </Text>
                     <Text style={styles.title}>
-                        {totalDayPlanFiber.toFixed(2) + " - Total Day's Fiber / 38g"}
+                        {"Fiber: " + totalDayPlanFiber.toFixed(2) + " / 38g"}
                     </Text>
                     <Text style={styles.title}>
-                        {totalDayPlanPro.toFixed(2) + " - Total Day's Protein / 50g"}
+                        {"Protein: " + totalDayPlanPro.toFixed(2) + " / 50g"}
                     </Text>
                     <Text style={styles.title}>
                         {totalDayPlanWater.toFixed(2) + "g - Total Day's Water"}
@@ -135,26 +132,46 @@ const styles = StyleSheet.create({
         color: themeOptions.dark_theme.text,
         margin: 20,
         padding: 15,
-        backgroundColor: themeOptions.dark_theme.primary_colour,
+        backgroundColor: themeOptions.dark_theme.secondary_colour,
+        color: themeOptions.light_theme.text,
         borderRadius: 6,
         alignSelf: 'center',
+        textAlign: 'center',
+        flex: 0.3,
+        marginTop: 10,
+        width: Dimensions.get("window").width - 50,
 
     },
     light_label: {
         color: themeOptions.light_theme.text,
         margin: 20,
         padding: 15,
-        backgroundColor: themeOptions.light_theme.primary_colour,
+        backgroundColor: themeOptions.light_theme.secondary_colour,
         borderRadius: 6,
         alignSelf: 'center',
+        textAlign: 'center',
+        flex: 0.3,
+        marginTop: 10,
+        width: Dimensions.get("window").width - 10,
 
     },
-    container: {
-        backgroundColor: "#737373",
+    dark_container: {
+        backgroundColor: themeOptions.dark_theme.primary_colour,
         flex: 0.3,
         marginTop: 10,
         width: Dimensions.get("window").width - 10,
         borderRadius: 5,
+        padding: 20,
+
+    },
+    light_container: {
+        backgroundColor: themeOptions.light_theme.primary_colour,
+        flex: 0.3,
+        marginTop: 10,
+        width: Dimensions.get("window").width - 10,
+        borderRadius: 5,
+        padding: 20,
+
     },
     item: {
         backgroundColor: "#737373",

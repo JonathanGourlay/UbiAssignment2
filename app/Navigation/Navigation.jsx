@@ -11,10 +11,29 @@ import { createMaterialBottomTabNavigator } from "@react-navigation/material-bot
 import { navigationRef } from "./NavigationRef";
 import themeOptions from "../Objects/ThemesObjects";
 
+import {
+    View,
+    StyleSheet,
+    Dimensions,
+    Text,
+    Pressable,
+} from "react-native";
+import "firebase/firestore";
+import { LoginModal } from "../Components/LoginModal";
+import { IsAuthed } from "../Scripts/GlobalState";
+import {
+    SignOut,
+} from "../Utils/Firebase";
+import { FirebaseAuthConsumer } from "@react-firebase/auth";
+import { CreateAccountModal } from "../Components/CreateAccountModal";
+
 const Tab = createMaterialBottomTabNavigator();
 
 export default Navigation = () => {
     let themeSwitch = ThemeSwitch.useContainer();
+    let { tryGetToken } = IsAuthed.useContainer();
+    const [loginModalVisible, setLoginModalVisible] = React.useState(false);
+    const [accountModalVisible, setAccountModalVisible] = React.useState(false);
 
     return (
         <NavigationContainer theme={themeSwitch.theme === "dark" ? themeOptions.light_theme : themeOptions.dark_theme} ref={navigationRef} >
@@ -24,12 +43,103 @@ export default Navigation = () => {
                 backgroundColor={themeSwitch.theme === "dark" ? themeOptions.light_theme.background : themeOptions.dark_theme.background}
                 translucent={true}
             ></StatusBar>
-            {/* <SearchBarComp /> */}
+
+
+            <FirebaseAuthConsumer>
+                {({ isSignedIn }) => {
+                    return isSignedIn ? (
+                        <View style={{ backgroundColor: themeSwitch.theme === "dark" ? themeOptions.light_theme.background : themeOptions.dark_theme.background, marginTop: 40 }}>
+                            <View style={{ flexDirection: 'row', alignSelf: 'flex-end', backgroundColor: themeSwitch.theme === "dark" ? themeOptions.light_theme.background : themeOptions.dark_theme.background }}>
+                                <Pressable
+                                    onPress={() => {
+                                        SignOut().then(() => {
+                                            tryGetToken();
+                                        });
+                                    }}
+                                    style={({ pressed }) => [
+                                        {
+                                            ...(themeSwitch.theme === "dark"
+                                                ? styles.light_label
+                                                : styles.dark_label),
+                                            backgroundColor: pressed
+                                                ? "red"
+                                                : themeSwitch.theme === "dark"
+                                                    ? styles.light_label.backgroundColor
+                                                    : styles.dark_label.backgroundColor,
+                                        },
+                                        ,
+                                    ]}
+                                >
+                                    <Text>Log out</Text>
+                                </Pressable>
+                            </View>
+                        </View>
+
+                    ) : (
+                            <View style={{ backgroundColor: themeSwitch.theme === "dark" ? themeOptions.light_theme.background : themeOptions.dark_theme.background, marginTop: 40 }}>
+                                <View style={{ flexDirection: 'row', alignSelf: 'flex-end', backgroundColor: themeSwitch.theme === "dark" ? themeOptions.light_theme.background : themeOptions.dark_theme.background }}>
+                                    <Pressable
+                                        onPress={() => setAccountModalVisible(true)}
+                                        style={({ pressed }) => [
+                                            {
+                                                ...(themeSwitch.theme === "dark"
+                                                    ? styles.light_label
+                                                    : styles.dark_label),
+                                                backgroundColor: pressed
+                                                    ? "red"
+                                                    : themeSwitch.theme === "dark"
+                                                        ? styles.light_label.backgroundColor
+                                                        : styles.dark_label.backgroundColor,
+                                                margin: 10
+                                            },
+                                            ,
+                                        ]}
+                                    >
+                                        <Text>Sign up</Text>
+                                    </Pressable>
+                                    <Pressable
+                                        onPress={() => setLoginModalVisible(true)}
+                                        style={({ pressed }) => [
+                                            {
+                                                ...(themeSwitch.theme === "dark"
+                                                    ? styles.light_label
+                                                    : styles.dark_label),
+                                                backgroundColor: pressed
+                                                    ? "red"
+                                                    : themeSwitch.theme === "dark"
+                                                        ? styles.light_label.backgroundColor
+                                                        : styles.dark_label.backgroundColor,
+                                            },
+                                            ,
+                                        ]}
+                                    >
+                                        <Text>Log in</Text>
+                                    </Pressable>
+
+                                    <LoginModal
+                                        visible={loginModalVisible}
+                                        setLoginModalVisible={setLoginModalVisible}
+                                    />
+                                    <CreateAccountModal
+                                        visible={accountModalVisible}
+                                        setAccountModalVisible={setAccountModalVisible}
+                                    />
+                                </View>
+                            </View>
+
+                        );
+
+
+                }
+                }
+            </FirebaseAuthConsumer>
+
             <Tab.Navigator
                 initialRouteName="Home"
                 activeColor={themeSwitch.theme === "dark" ? themeOptions.light_theme.primary_colour : themeOptions.dark_theme.primary_colour}
                 inactiveColor={themeSwitch.theme === "dark" ? themeOptions.light_theme.secondary_colour : themeOptions.dark_theme.secondary_colour}
                 shifting={true}
+                style={{ backgroundColor: themeSwitch.theme === "dark" ? themeOptions.light_theme.background : themeOptions.dark_theme.background }}
                 barStyle={{ backgroundColor: themeSwitch.theme === "dark" ? themeOptions.light_theme.background : themeOptions.dark_theme.background }}
             >
                 <Tab.Screen
@@ -52,16 +162,6 @@ export default Navigation = () => {
                         ),
                     }}
                 />
-                {/* <Tab.Screen
-                    name="Nutritional Dashboard"
-                    component={MealPlan}
-                    options={{
-                        tabBarLabel: "Dashboard",
-                        tabBarIcon: ({ color }) => (
-                            <MaterialCommunityIcons name="view-dashboard" color={color} size={26} />
-                        ),
-                    }}
-                /> */}
 
                 <Tab.Screen
                     name="Search Recipes"
@@ -101,3 +201,36 @@ export default Navigation = () => {
         </NavigationContainer>
     )
 }
+const styles = StyleSheet.create({
+    item: {
+        backgroundColor: "#f9c2ff",
+        padding: 20,
+        marginVertical: 8,
+    },
+    header: {
+        fontSize: 32,
+        backgroundColor: "#fff",
+        width: Dimensions.get("screen").width,
+    },
+    title: {
+        fontSize: 24,
+    },
+    dark_label: {
+        color: themeOptions.dark_theme.text,
+        padding: 10,
+        marginTop: 10,
+        marginBottom: 5,
+        backgroundColor: themeOptions.dark_theme.primary_colour,
+        borderRadius: 6,
+        alignSelf: "center",
+    },
+    light_label: {
+        color: themeOptions.light_theme.text,
+        marginBottom: 5,
+        marginTop: 10,
+        padding: 10,
+        backgroundColor: themeOptions.light_theme.primary_colour,
+        borderRadius: 6,
+        alignSelf: "center",
+    },
+});
