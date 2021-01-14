@@ -86,7 +86,7 @@ export default Navigation = () => {
                                                     ? styles.light_label
                                                     : styles.dark_label),
                                                 backgroundColor: pressed
-                                                    ? "red"
+                                                    ? "green"
                                                     : themeSwitch.theme === "dark"
                                                         ? styles.light_label.backgroundColor
                                                         : styles.dark_label.backgroundColor,
@@ -105,7 +105,7 @@ export default Navigation = () => {
                                                     ? styles.light_label
                                                     : styles.dark_label),
                                                 backgroundColor: pressed
-                                                    ? "red"
+                                                    ? "green"
                                                     : themeSwitch.theme === "dark"
                                                         ? styles.light_label.backgroundColor
                                                         : styles.dark_label.backgroundColor,

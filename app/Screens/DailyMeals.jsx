@@ -14,6 +14,7 @@ import themeOptions from '../Objects/ThemesObjects';
 import { ThemeSwitch } from "../Scripts/GlobalState";
 import { IsAuthed } from "../Scripts/GlobalState";
 import { DailyMealcard } from "../Components/MealCard";
+import { FirebaseAuthConsumer } from "@react-firebase/auth";
 
 export const DailyMeals = () => {
     const [state, setState] = React.useState();
@@ -59,6 +60,32 @@ export const DailyMeals = () => {
         }
     }, []);
 
+    // run when token changes, searches firebase for mealplans where the uid matches logged in user's
+    React.useEffect(() => {
+        if (token !== undefined) {
+            (async () => {
+
+                const result = await firebase
+                    .firestore()
+                    .collection("/mealPlans/")
+                    .orderBy("created", "desc")
+                    .where("uid", "==", token)
+                    .limit(1)
+                    .get();
+
+                result.forEach((mealPlan) => {
+                    const day = mealPlan.get("mealPlan." + dayNum)
+                    let sortedMeals = Object.keys(day.meals).sort((a, b) => {
+                        return mealTypePriority[a] - mealTypePriority[b];
+                    }).map((key) => {
+                        return day.meals[key]
+                    })
+                    setState(sortedMeals);
+                })
+            })();
+        }
+    }, [token]);
+
     // return null so the content is not displayed
     if (state === undefined) { return null; }
 
@@ -70,59 +97,72 @@ export const DailyMeals = () => {
                 alignSelf: "auto",
             }}
         >
-            <ScrollView>
-                {state.map((mealType, index) => {
-                    totalDayPlanCal += mealType.meal.Calories / mealType.meal.Serves
-                    totalDayPlanFat += mealType.meal.TotalNutrients.TotalFat.Quantity / mealType.meal.Serves
-                    totalDayPlanPro += mealType.meal.TotalNutrients.TotalProtein.Quantity / mealType.meal.Serves
-                    totalDayPlanCarbs += mealType.meal.TotalNutrients.TotalCarbs.Quantity / mealType.meal.Serves
-                    totalDayPlanSugar += mealType.meal.TotalNutrients.TotalSugar.Quantity / mealType.meal.Serves
-                    totalDayPlanWater += mealType.meal.TotalNutrients.TotalWater.Quantity / mealType.meal.Serves
-                    totalDayPlanFiber += mealType.meal.TotalNutrients.TotalFiber.Quantity / mealType.meal.Serves
-                    totalDayPlanChol += mealType.meal.TotalNutrients.TotalCholesterol.Quantity / mealType.meal.Serves
+            <FirebaseAuthConsumer>
+                {({ isSignedIn }) => {
+                    return isSignedIn ? (
+                        <ScrollView>
+                            {state.map((mealType, index) => {
+                                totalDayPlanCal += mealType.meal.Calories / mealType.meal.Serves
+                                totalDayPlanFat += mealType.meal.TotalNutrients.TotalFat.Quantity / mealType.meal.Serves
+                                totalDayPlanPro += mealType.meal.TotalNutrients.TotalProtein.Quantity / mealType.meal.Serves
+                                totalDayPlanCarbs += mealType.meal.TotalNutrients.TotalCarbs.Quantity / mealType.meal.Serves
+                                totalDayPlanSugar += mealType.meal.TotalNutrients.TotalSugar.Quantity / mealType.meal.Serves
+                                totalDayPlanWater += mealType.meal.TotalNutrients.TotalWater.Quantity / mealType.meal.Serves
+                                totalDayPlanFiber += mealType.meal.TotalNutrients.TotalFiber.Quantity / mealType.meal.Serves
+                                totalDayPlanChol += mealType.meal.TotalNutrients.TotalCholesterol.Quantity / mealType.meal.Serves
 
-                    return (
+                                return (
 
-                        <DailyMealcard
-                            key={index}
-                            mealObject={mealType}
-                            setModalVisible={setModalVisible}
-                            setSelectedMeal={setSelectedMeal}
-                        />
-                    );
-                })}
-                <View style={themeSwitch.theme === "dark" ? styles.light_container : styles.dark_container}>
-                    <Text style={styles.title}>
-                        {"Calories: " + totalDayPlanCal.toFixed(2) + " / 2000 kcal"}
-                    </Text>
-                    <Text style={styles.title}>
-                        {"Fats: " + totalDayPlanFat.toFixed(2) + " / 70g"}
-                    </Text>
-                    <Text style={styles.title}>
-                        {"Carbs: " + totalDayPlanCarbs.toFixed(2) + " / 300g "}
-                    </Text>
-                    <Text style={styles.title}>
-                        {"Sugars: " + totalDayPlanSugar.toFixed(2) + " / 50g"}
-                    </Text>
-                    <Text style={styles.title}>
-                        {"Cholesterol: " + totalDayPlanChol.toFixed(2) + " / 300mg"}
-                    </Text>
-                    <Text style={styles.title}>
-                        {"Fiber: " + totalDayPlanFiber.toFixed(2) + " / 38g"}
-                    </Text>
-                    <Text style={styles.title}>
-                        {"Protein: " + totalDayPlanPro.toFixed(2) + " / 50g"}
-                    </Text>
-                    <Text style={styles.title}>
-                        {totalDayPlanWater.toFixed(2) + "g - Total Day's Water"}
-                    </Text>
-                </View>
-                <MealModal
-                    selectedMeal={selectedMeal}
-                    visible={modalVisible}
-                    setModalVisible={setModalVisible}
-                />
-            </ScrollView>
+                                    <DailyMealcard
+                                        key={index}
+                                        mealObject={mealType}
+                                        setModalVisible={setModalVisible}
+                                        setSelectedMeal={setSelectedMeal}
+                                    />
+                                );
+                            })}
+                            <View style={themeSwitch.theme === "dark" ? styles.light_container : styles.dark_container}>
+                                <Text style={styles.title}>
+                                    {"Calories: " + totalDayPlanCal.toFixed(2) + " / 2000 kcal"}
+                                </Text>
+                                <Text style={styles.title}>
+                                    {"Fats: " + totalDayPlanFat.toFixed(2) + " / 70g"}
+                                </Text>
+                                <Text style={styles.title}>
+                                    {"Carbs: " + totalDayPlanCarbs.toFixed(2) + " / 300g "}
+                                </Text>
+                                <Text style={styles.title}>
+                                    {"Sugars: " + totalDayPlanSugar.toFixed(2) + " / 50g"}
+                                </Text>
+                                <Text style={styles.title}>
+                                    {"Cholesterol: " + totalDayPlanChol.toFixed(2) + " / 300mg"}
+                                </Text>
+                                <Text style={styles.title}>
+                                    {"Fiber: " + totalDayPlanFiber.toFixed(2) + " / 38g"}
+                                </Text>
+                                <Text style={styles.title}>
+                                    {"Protein: " + totalDayPlanPro.toFixed(2) + " / 50g"}
+                                </Text>
+                                <Text style={styles.title}>
+                                    {totalDayPlanWater.toFixed(2) + "g - Total Day's Water"}
+                                </Text>
+                            </View>
+                            <MealModal
+                                selectedMeal={selectedMeal}
+                                visible={modalVisible}
+                                setModalVisible={setModalVisible}
+                            />
+                        </ScrollView>)
+
+                        : (
+                            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', alignSelf: 'center', flexDirection: 'column', alignSelf: 'stretch' }} >
+                                <Text
+                                    style={{ textAlign: 'center' }}
+                                >Please Login to use the application</Text>
+                            </View>
+                        )
+                }}
+            </FirebaseAuthConsumer>
         </View>
     );
 };

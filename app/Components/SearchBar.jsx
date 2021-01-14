@@ -41,6 +41,7 @@ const SearchView = () => {
   // this function implements the recipe api and sets the results to state
   const RunSearch = (searchParam) => {
     if (searchParam !== "" && searchParam !== undefined) {
+      console.log("https://edamam-recipe-search.p.rapidapi.com/search?q=" + searchParam + "&to=" + searchNum + "&calories=" + calRange.min + "-" + calRange.max + "&ingr=" + maxIng)
       fetch(
         "https://edamam-recipe-search.p.rapidapi.com/search?q=" + searchParam + "&to=" + searchNum + "&calories=" + calRange.min + "-" + calRange.max + "&ingr=" + maxIng,
         {
@@ -74,7 +75,7 @@ const SearchView = () => {
   }
 
   return (
-    <SafeAreaView style={searchedText !== "" && { flex: 1 }}>
+    <View style={searchedText !== "" && { flex: 1 }} >
       <SearchBar
         containerStyle={{
           backgroundColor: themeType.colors.background,
@@ -92,7 +93,7 @@ const SearchView = () => {
       <Text style={{
         color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text,
         ...styles.smaller_title, textAlign: 'center', height: 20, alignSelf: 'center'
-      }}>Number of recipies to search{" - " + searchNum}</Text>
+      }}>Number of recipes to search{" - " + searchNum}</Text>
       <Slider
         style={{ width: 400, height: 40 }}
         minimumValue={5}
@@ -103,8 +104,11 @@ const SearchView = () => {
         step={5}
         onSlidingComplete={(num) => { setSearchNum(num) }}
       />
+
       <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+
         <View style={{ flexDirection: 'column' }}>
+
           <Text style={{
             color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text,
             ...styles.smaller_title, textAlign: 'center', height: 20, alignSelf: 'center'
@@ -131,7 +135,7 @@ const SearchView = () => {
         </View>
         <View style={{
           color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text,
-          ...styles.smaller_title, textAlign: 'center', height: 20, alignSelf: 'center'
+          ...styles.smaller_title, textAlign: 'center', alignSelf: 'center'
         }}>
           <Text style={{ height: 20, alignSelf: 'center' }}>Max ingredients</Text>
           <TextInput
@@ -147,7 +151,7 @@ const SearchView = () => {
       <View style={{ borderRadius: 20 }}>
         <Text style={{
           color: themeSwitch.theme === "dark" ? themeOptions.light_theme.text : themeOptions.dark_theme.text,
-          textAlign: 'center', height: 20,
+          textAlign: 'center', height: 20, marginTop: 10
         }}>Meal Type</Text>
         <Picker
           selectedValue={mealType.searchMealType}
@@ -244,7 +248,7 @@ const SearchView = () => {
           }}
         />
       </View>
-    </SafeAreaView >
+    </View >
   );
 }
 

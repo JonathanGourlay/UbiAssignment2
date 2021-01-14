@@ -60,6 +60,8 @@ const MealCard = (props) => {
 }
 const SearchMealCard = (props) => {
     let themeSwitch = ThemeSwitch.useContainer();
+    console.log("hit card")
+    console.log(props.mealObject.meal.Name)
     return (
         <View style={themeSwitch.theme === "dark" ? styles.light_container : styles.dark_container} onTouchEnd={() => {
             props.onPress();
@@ -73,7 +75,6 @@ const SearchMealCard = (props) => {
             <Text style={styles.small_title}>
                 Click Me to add to liked meals
             </Text>
-
         </View>
     );
 }

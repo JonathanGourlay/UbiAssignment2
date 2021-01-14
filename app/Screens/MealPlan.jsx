@@ -187,7 +187,7 @@ export const MealPlan = () => {
             />
             <ScrollView>
 
-                <FirebaseAuthConsumer>
+                <FirebaseAuthConsumer >
                     {({ isSignedIn }) => {
                         return isSignedIn ? (
                             <View >
@@ -496,25 +496,25 @@ export const MealPlan = () => {
 
                                 <View style={themeSwitch.theme === "dark" ? styles.light_container : styles.dark_container}>
                                     <Text style={styles.title}>
-                                        {"Calories: " + totalMealPlanCal.toFixed(2) + " / 2000 kcal"}
+                                        {"Calories: " + totalMealPlanCal.toFixed(2) + " / 14000 kcal"}
                                     </Text>
                                     <Text style={styles.title}>
-                                        {"Fats: " + totalMealPlanFat.toFixed(2) + " / 70g"}
+                                        {"Fats: " + totalMealPlanFat.toFixed(2) + " / 500g"}
                                     </Text>
                                     <Text style={styles.title}>
-                                        {"Carbs: " + totalMealPlanCarbs.toFixed(2) + " / 300g "}
+                                        {"Carbs: " + totalMealPlanCarbs.toFixed(2) + " / 2100g "}
                                     </Text>
                                     <Text style={styles.title}>
-                                        {"Sugars: " + totalMealPlanSugar.toFixed(2) + " / 50g"}
+                                        {"Sugars: " + totalMealPlanSugar.toFixed(2) + " / 350g"}
                                     </Text>
                                     <Text style={styles.title}>
-                                        {"Cholesterol: " + totalMealPlanChol.toFixed(2) + " / 300mg"}
+                                        {"Cholesterol: " + totalMealPlanChol.toFixed(2) + " / 2100mg"}
                                     </Text>
                                     <Text style={styles.title}>
-                                        {"Fiber: " + totalMealPlanFiber.toFixed(2) + " / 38g"}
+                                        {"Fiber: " + totalMealPlanFiber.toFixed(2) + " / 266g"}
                                     </Text>
                                     <Text style={styles.title}>
-                                        {"Protein: " + totalMealPlanPro.toFixed(2) + " / 50g"}
+                                        {"Protein: " + totalMealPlanPro.toFixed(2) + " / 350g"}
                                     </Text>
                                     <Text style={styles.title}>
                                         {totalMealPlanWater.toFixed(2) + "g - Total Weeks's Water"}
@@ -530,9 +530,9 @@ export const MealPlan = () => {
                                 />
                             </View>
                         ) : (
-                                <View style={themeSwitch.theme === "dark" ? styles.light_container : styles.dark_container}  >
+                                <View style={{ marginTop: Dimensions.get('screen').height / 2.65 }}>
                                     <Text
-                                        style={{ textAlign: 'center' }}
+                                        style={{ textAlign: 'center', justifyContent: 'center', }}
                                     >Please Login to use the application</Text>
                                 </View>
                             )
